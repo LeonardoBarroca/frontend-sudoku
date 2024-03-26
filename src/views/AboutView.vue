@@ -46,7 +46,7 @@ export default {
       formData.append('blue', this.blue);
 
       try {
-        const response = await fetch('http://127.0.0.1:5000/upload', {
+        const response = await fetch('https://backend-image-edit-1.onrender.com/upload', {
           method: 'POST',
           body: formData
         });
