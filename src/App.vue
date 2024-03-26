@@ -1,22 +1,26 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import Navbar from '@/components/Navbar.vue';
+import Footer from '@/components/Footer.vue';
 
 </script>
-
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-
-      <nav>
-        <RouterLink to="/">Home Page</RouterLink>
-        <RouterLink to="/about">About Page</RouterLink>
-      </nav>
-    </div>
+    <Navbar />
   </header>
-
   <RouterView></RouterView>
+  <div class="test">
+    <Footer></Footer>
+  </div>
 </template>
 
-<style scoped></style>
+<style>
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+.test {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+</style>
