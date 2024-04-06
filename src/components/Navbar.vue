@@ -7,11 +7,11 @@
         </a>
       </li>
       <li><a>
-          <RouterLink to="/">Home</RouterLink>
+          <RouterLink to="/">Sobre</RouterLink>
         </a>
       </li>
       <li><a>
-          <RouterLink to="/about">Editor</RouterLink>
+          <RouterLink to="/about">Sudoku</RouterLink>
         </a>
       </li>
     </ul>

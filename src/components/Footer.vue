@@ -1,13 +1,13 @@
 <template>
   <footer class="footer">
     <div class="social-icons">
-      <a href="https://github.com/LeonardoBarroca" target="_blank" rel="noopener noreferrer">
+      <a href="https://github.com/" target="_blank" rel="noopener noreferrer">
         <IconGithub />
       </a>
       <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
         <IconInstagram />
       </a>
-      <a href="https://www.linkedin.com/in/leonardo-barroca-0494b4143/" target="_blank" rel="noopener noreferrer">
+      <a href="https://www.linkedin.com/in/" target="_blank" rel="noopener noreferrer">
         <IconLinkedin />
       </a>
     </div>

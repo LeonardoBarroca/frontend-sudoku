@@ -1,8 +1,8 @@
 <template>
   <div class="presentation-page">
-    <h1 class="title">Bem-vindo ao SIE (Simple Image Editor)</h1>
-    <p class="description">Explore, Descubra, Aventure-se!</p>
-    <p class="highlight">Selecione, edite o RGB de sua imagem, baixe gratuitamente sem marcas d'água</p>
+    <h1 class="title">Bem-vindo ao Sudoku!</h1>
+    <p class="description">Jogue e divirta-se!</p>
+    <p class="highlight">Validador de Sudoku 4x4 com (AFD) Autômato Finito Determinístico </p>
   </div>
 </template>
 

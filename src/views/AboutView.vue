@@ -1,50 +1,21 @@
 <template>
-  <!-- Novo botão "Tirar Dúvidas" -->
-  <div class="duvidas">
-    <button @click="toggleHelp" class="btn btn-secondary" title="Tirar Dúvidas">Tirar Dúvidas</button>
-
-    <!-- Área de texto para exibir quando "Tirar Dúvidas" for clicado -->
-    <p v-if="showHelp">
-      A alteração do RGB em uma imagem ocorre manipulando os valores dos canais de cor vermelho (R), verde (G) e azul
-      (B)
-      de cada pixel da imagem. Cada pixel em uma imagem digital é representado por uma combinação de intensidades de cor
-      nos canais RGB, onde valores mais altos representam uma maior intensidade da cor correspondente e valores mais
-      baixos representam uma menor intensidade.
-
-      Por exemplo, se tivermos um pixel com a cor RGB(10, 10, 10) e aplicarmos um aumento de intensidade para RGB(20,
-      20,
-      20), isso resultará em uma alteração perceptível na cor do pixel. Aumentar os valores de R, G e B resultará em uma
-      cor mais clara e mais brilhante, enquanto diminuir esses valores resultará em uma cor mais escura e mais opaca.
-
-      Essencialmente, ao alterar os valores RGB de uma imagem, estamos ajustando a intensidade das cores vermelha, verde
-      e
-      azul em cada pixel, o que modifica a cor geral da imagem. Isso é feito de forma individual para cada pixel,
-      permitindo uma ampla variedade de manipulações de cor e efeitos visuais em uma imagem digital.</p>
-  </div>
-  <div class="editor-area">
-    <div class="container-rgb">
-      <input type="file" @change="handleFileUpload" class="input-file">
-      <div class="input-group">
-        <label for="red" class="label">Red:</label>
-        <input type="number" id="red" v-model="red" class="input" min="0" max="255">
+  <div class="sudoku-game">
+    <h1>Sudoku 4x4</h1>
+    <div class="sudoku-board">
+      <div class="sudoku-table">
+        <div v-for="(row, rowIndex) in sudoku" :key="rowIndex" class="row">
+          <div v-for="(cell, colIndex) in row" :key="colIndex" :class="['cell', { 'fixed-cell': cell.readonly }]">
+            <input type="text" :value="cell.value" :readonly="cell.readonly"
+              @input="updateCell(rowIndex, colIndex, $event.target.value)">
+          </div>
+        </div>
       </div>
-      <div class="input-group">
-        <label for="green" class="label">Green:</label>
-        <input type="number" id="green" v-model="green" class="input" min="0" max="255">
-      </div>
-      <div class="input-group">
-        <label for="blue" class="label">Blue:</label>
-        <input type="number" id="blue" v-model="blue" class="input" min="0" max="255">
-      </div>
-      <button @click="uploadImage" type="button" class="btn btn-primary" title="Aplicar e Visualizar">Aplicar e
-        Visualizar</button>
-      <button @click="downloadImage" type="button" class="btn btn-outline-primary" title="Baixar Imagem">Baixar
-        Imagem</button>
-
-
     </div>
-    <div v-if="imageUrl" class="image-preview">
-      <img :src="imageUrl" alt="Imagem Recebida" class="preview">
+    <div class="new-game">
+      <button class="btn btn-outline-secondary" @click="generateNewGame">Novo Jogo</button>
+    </div>
+    <div class="validade-sudoku">
+      <button class="btn btn-primary" @click="submitSudoku" :disabled="!isSudokuComplete">Enviar</button>
     </div>
   </div>
 </template>
@@ -53,127 +24,140 @@
 export default {
   data() {
     return {
-      file: null,
-      imageUrl: null,
-      red: 0,
-      green: 0,
-      blue: 0,
-      showHelp: false // Variável de estado para controlar a exibição do texto de ajuda
+      sudoku: [],
     };
   },
-  methods: {
-    handleFileUpload(event) {
-      this.file = event.target.files[0];
-    },
-    async uploadImage() {
-      const formData = new FormData();
-      formData.append('image', this.file);
-      formData.append('red', this.red);
-      formData.append('green', this.green);
-      formData.append('blue', this.blue);
-
-      try {
-        const response = await fetch('https://backend-image-edit-1.onrender.com/upload', {
-          method: 'POST',
-          body: formData
-        });
-        const data = await response.blob();
-        const imageUrl = URL.createObjectURL(data);
-        this.imageUrl = imageUrl;
-      } catch (error) {
-        console.error('Erro ao enviar imagem:', error);
+  computed: {
+    isSudokuComplete() {
+      for (let i = 0; i < this.sudoku.length; i++) {
+        for (let j = 0; j < this.sudoku[i].length; j++) {
+          if (!this.sudoku[i][j].readonly && !this.sudoku[i][j].value) {
+            return false;
+          }
+        }
       }
-    },
-    downloadImage() {
-      const link = document.createElement('a');
-      link.href = this.imageUrl;
-      link.download = 'edited_image.png';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    },
-    toggleHelp() {
-      this.showHelp = !this.showHelp; // Alternar o estado de exibição do texto de ajuda
+      return true;
     }
-  }
+  },
+  created() {
+    this.generateNewGame();
+  },
+  methods: {
+    generateNewGame() {
+      this.sudoku = this.generateSudoku();
+    },
+    generateSudoku() {
+      const sudoku = [];
+      const fixedIndexes = [1, 6, 11, 16];
+
+      const uniqueNumbers = this.generateUniqueNumbers(4);
+
+      for (let i = 0; i < 4; i++) {
+        const row = [];
+        for (let j = 0; j < 4; j++) {
+          let value;
+          if (fixedIndexes.includes(i * 4 + j + 1)) {
+            value = uniqueNumbers.pop();
+          } else {
+            value = '';
+          }
+          row.push({ value: value, readonly: fixedIndexes.includes(i * 4 + j + 1) });
+        }
+        sudoku.push(row);
+      }
+      return sudoku;
+    },
+    generateUniqueNumbers(count) {
+      const numbers = [];
+      while (numbers.length < count) {
+        const num = this.generateRandomNumber();
+        if (!numbers.includes(num)) {
+          numbers.push(num);
+        }
+      }
+      return numbers;
+    },
+    generateRandomNumber() {
+      return Math.floor(Math.random() * 4) + 1;
+    },
+    updateCell(rowIndex, colIndex, value) {
+      const newValue = value.replace(/[^1-4]/g, '');
+      this.sudoku[rowIndex][colIndex].value = newValue;
+    },
+    submitSudoku() {
+      if (this.isSudokuComplete) {
+        const data = this.sudoku.map(row => row.map(cell => parseInt(cell.value)));
+        console.log(data)
+
+        fetch('http://localhost:5000/validate-sudoku', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ sudoku: data })
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.valid) {
+              alert('Sudoku válido!');
+            } else {
+              alert('Sudoku inválido!');
+            }
+          })
+          .catch(error => {
+            console.error('Erro ao enviar Sudoku:', error);
+          });
+      } else {
+        alert('Preencha todas as células do Sudoku antes de enviar.');
+      }
+    }
+  },
 };
 </script>
 
 <style>
-.editor-area {
-  width: 100%;
-  display: flex;
-  margin-top: 10%;
-}
-
-.container-rgb {
-  margin-left: 16px;
-  display: flex;
+.sudoku-game {
+  margin-top: 16px;
+  text-align: center;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 300px;
-  width: 400px;
-  border: 1px solid #ccc;
 }
 
-.input-group {
-  margin-bottom: 10px;
+.sudoku-board {
+  margin: 16px;
   display: flex;
-  align-items: center;
+  justify-content: center;
 }
 
-.label {
-  width: 70px;
-  text-align: right;
-  margin-right: 10px;
+.row {
+  width: 160px;
 }
 
-.input {
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  min-width: 270px;
+.cell {
+  border: 1px solid #000;
+  width: 40px;
+  height: 40px;
 }
 
-.input-file {
-  margin-bottom: 10px;
-  width: 330px;
+.fixed-cell {
+  background-color: lightgray;
 }
 
-.image-preview {
-  max-width: 300px;
-  max-height: 300px;
+input {
+  width: 100%;
+  height: 100%;
+  font-size: 20px;
+  text-align: center;
+  border: none;
+  outline: none;
+  background: transparent;
 }
 
-.preview {
-  max-width: 300px;
-  max-height: 300px;
-  margin-left: 16px;
+.btn-outline-secondary {
+  width: 160px;
 }
 
 .btn-primary {
-  width: 325px;
-  margin-top: 10px;
-}
-
-.btn-outline-primary {
-  width: 325px;
-  margin-top: 10px;
-}
-
-/* Estilo para o novo botão "Tirar Dúvidas" */
-.btn-secondary {
-  width: 325px;
-  margin-top: 10px;
-}
-
-.duvidas {
-  padding-left: 8px;
-}
-
-/* Estilo para o texto de ajuda */
-p {
-  margin-top: 10px;
+  margin-top: 16px;
+  width: 160px;
 }
 </style>
