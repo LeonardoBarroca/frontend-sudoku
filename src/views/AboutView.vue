@@ -15,7 +15,7 @@
       <button class="btn btn-outline-secondary" @click="generateNewGame">Novo Jogo</button>
     </div>
     <div class="validade-sudoku">
-      <button class="btn btn-primary" @click="submitSudoku" :disabled="!isSudokuComplete">Enviar</button>
+      <button class="btn btn-primary" @click="submitSudoku" :disabled="!isSudokuComplete">Validar Autômato</button>
     </div>
   </div>
 </template>
@@ -89,7 +89,7 @@ export default {
         const data = this.sudoku.map(row => row.map(cell => parseInt(cell.value)));
         console.log(data)
 
-        fetch('http://localhost:5000/validate-sudoku', {
+        fetch('http://127.0.0.1:5000/validate-sudoku', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
