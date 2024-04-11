@@ -16,6 +16,9 @@
     </div>
     <div class="validade-sudoku">
       <button class="btn btn-primary" @click="submitSudoku" :disabled="!isSudokuComplete">Validar Autômato</button>
+      <div class="validation-result" :class="{ 'valid': isValid, 'invalid': !isValid }">
+        {{ isValid ? 'Autômato válido' : 'Autômato inválido' }}
+      </div>
     </div>
   </div>
 </template>
@@ -25,6 +28,7 @@ export default {
   data() {
     return {
       sudoku: [],
+      isValid: false
     };
   },
   computed: {
@@ -89,7 +93,7 @@ export default {
         const data = this.sudoku.map(row => row.map(cell => parseInt(cell.value)));
         console.log(data)
 
-        fetch('http://127.0.0.1:5000/validate-sudoku', {
+        fetch('https://backend-sudoku.onrender.com/validate-sudoku', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -98,11 +102,7 @@ export default {
         })
           .then(response => response.json())
           .then(data => {
-            if (data.valid) {
-              alert('Sudoku válido!');
-            } else {
-              alert('Sudoku inválido!');
-            }
+            this.isValid = data.valid; // Atualiza a propriedade isValid com base na resposta do backend
           })
           .catch(error => {
             console.error('Erro ao enviar Sudoku:', error);
@@ -159,5 +159,18 @@ input {
 .btn-primary {
   margin-top: 16px;
   width: 160px;
+}
+
+.validation-result {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.valid {
+  color: green;
+}
+
+.invalid {
+  color: red;
 }
 </style>
